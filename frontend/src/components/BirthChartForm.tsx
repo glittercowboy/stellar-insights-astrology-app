@@ -70,11 +70,14 @@ export function BirthChartForm() {
       // Store form data in session storage for the results page
       sessionStorage.setItem('birthData', JSON.stringify(birthData));
       
-      // In development mode, we'll just redirect to the results page
-      // In production, we would call the API directly here
-      if (process.env.NODE_ENV === 'production') {
-        // Generate chart and reading before navigating
+      // Always generate chart and reading before navigating
+      // This ensures we're not using mock data
+      try {
+        // Pre-fetch the data to check if the API is working correctly
         await astrologyApi.generateFullAnalysis(birthData);
+      } catch (err: any) {
+        console.error("API pre-fetch error:", err);
+        // If there's an API error, we still store the data and let the results page handle it
       }
       
       // Navigate to results page

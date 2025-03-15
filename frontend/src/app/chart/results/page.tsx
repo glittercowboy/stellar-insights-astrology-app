@@ -10,9 +10,6 @@ import { BirthChart } from "@/components/BirthChart";
 import { ChartDetails } from "@/components/ChartDetails";
 import { astrologyApi, BirthData, ChartAndReadingData } from "@/lib/api";
 
-// Mock data for fallback/development
-import { MOCK_PLANETS, MOCK_ASPECTS, MOCK_READING } from "@/lib/mock-data";
-
 export default function ChartResultsPage() {
   const searchParams = useSearchParams();
   const name = searchParams.get("name") || "Friend";
@@ -28,35 +25,17 @@ export default function ChartResultsPage() {
         const birthDataStr = sessionStorage.getItem('birthData');
         
         if (!birthDataStr) {
-          // Fallback to mock data if no birth data is found
-          setTimeout(() => {
-            setChartData({
-              planets: MOCK_PLANETS,
-              aspects: MOCK_ASPECTS
-            });
-            setReadingContent(MOCK_READING.replace("[Name]", name));
-            setIsLoading(false);
-          }, 1000);
+          setError("No birth data found. Please return to the form and enter your details.");
+          setIsLoading(false);
           return;
         }
 
         const birthData: BirthData = JSON.parse(birthDataStr);
         
-        // Use real API in production, mock data in development
-        if (process.env.NODE_ENV === 'production') {
-          const data: ChartAndReadingData = await astrologyApi.generateFullAnalysis(birthData);
-          setChartData(data.chart);
-          setReadingContent(data.reading.content);
-        } else {
-          // Simulate API call with mock data in development
-          setTimeout(() => {
-            setChartData({
-              planets: MOCK_PLANETS,
-              aspects: MOCK_ASPECTS
-            });
-            setReadingContent(MOCK_READING.replace("[Name]", name));
-          }, 1500);
-        }
+        // Always use the real API
+        const data: ChartAndReadingData = await astrologyApi.generateFullAnalysis(birthData);
+        setChartData(data.chart);
+        setReadingContent(data.reading.content);
       } catch (err: any) {
         console.error("Error fetching data:", err);
         setError(err.response?.data?.detail || "An error occurred while generating your chart. Please try again.");

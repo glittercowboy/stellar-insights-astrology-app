@@ -3,7 +3,7 @@ from typing import Dict, List, Any, Optional, Union
 from pydantic import BaseModel
 import immanuel.const
 import immanuel.setup
-import immanuel.timeline
+# Removed problematic import: import immanuel.timeline
 from immanuel.reports.aspects import get_aspects
 from immanuel.reports.planets import get_planets
 from immanuel.reports.houses import get_houses
@@ -36,7 +36,7 @@ def create_chart_data(person_data: Dict[str, Any]) -> Dict[str, Any]:
     
     # Get house information if birth time is known
     houses = None
-    if person_data.get("birth_time"):
+    if person_data.get("hour") is not None and person_data.get("minute") is not None:
         houses = get_houses(chart_data)
     
     # Get aspects between planets
